@@ -1,328 +1,693 @@
-<div class="p-4 max-w-5xl mx-auto grid gap-4">
-  <!-- Filtros -->
-  <div class="flex flex-wrap items-center justify-between gap-2">
-    <h1 class="text-2xl font-semibold">Resultados</h1>
-    <div class="flex flex-wrap gap-2 items-center">
-      <label class="text-sm">Estado:</label>
-      <select [(ngModel)]="statusFilter" (change)="applyFilters()" class="border rounded px-2 py-1">
-        <option value="FINISHED">Finalizados</option>
-        <option value="ALL">Todos</option>
-        <option value="IN_PROGRESS">En progreso</option>
-        <option value="SCHEDULED">Programados</option>
-      </select>
+<<<<<<< Updated upstream
+<!-- src/app/pages/results-page.component.html -->
+<section data-ui="results-hud">
+  <style>
+    [data-ui="results-hud"]{
+      --bg:#0b0a1a; --panel:#14122b; --line:#2b2a4a;
+      --text:#e7e9ff; --muted:#9aa0bd; --cy:#00e5ff; --mg:#ff3ea5; --yl:#ffd166;
+      min-height:100vh; color:var(--text);
+      background: radial-gradient(1200px 600px at 50% -220px, #1f1b49 0%, #0b0a1a 55%, #070616 100%);
+      font-family:"Orbitron","Audiowide","Rajdhani","Segoe UI", Roboto, system-ui, -apple-system, sans-serif;
+      letter-spacing:.2px;
+    }
+    .wrap{ max-width:1200px; margin:0 auto; padding:16px; display:grid; gap:16px }
 
-      <label class="text-sm ml-3">Buscar equipo:</label>
-      <input [(ngModel)]="q" (input)="applyFilters()" placeholder="nombre contiene…" class="border rounded px-2 py-1" />
-    </div>
+    /* filtros */
+    .filters{
+      display:flex; flex-wrap:wrap; align-items:center; gap:10px; justify-content:space-between;
+      background:linear-gradient(180deg, rgba(20,18,43,.9), rgba(12,11,26,.85));
+      border:1px solid var(--line); border-radius:16px; padding:10px 12px;
+      box-shadow:0 12px 30px rgba(0,0,0,.4), inset 0 0 0 1px rgba(255,255,255,.04);
+    }
+    .group{ display:flex; gap:8px; align-items:center; flex-wrap:wrap }
+    .sel,.inp{ background:#121030; border:1px solid #2b2a4a; color:var(--text); border-radius:12px; padding:8px 10px; font-size:13px }
+    .grid{ display:grid; gap:16px; grid-template-columns:1fr 2fr } @media(max-width:900px){ .grid{ grid-template-columns:1fr } }
+    .panel{ background:linear-gradient(180deg, rgba(20,18,43,.9), rgba(12,11,26,.9)); border:1px solid #2b2a4a; border-radius:16px; padding:12px;
+      box-shadow:0 16px 40px rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,255,255,.04); }
+    .h3{ font-size:16px; font-weight:900; margin:0 0 8px }
+    .list{ list-style:none; margin:0; padding:0; border-top:1px solid rgba(255,255,255,.06) }
+    .row{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 0; border-bottom:1px solid rgba(255,255,255,.06) }
+    .meta{ font-size:11px; color:var(--muted) }
+    .scroll{ max-height:18rem; overflow:auto }
+    .btn3d{ --bg:#1e1b3a; --bs:#0c0a1e; --bd:#2f2b58; background: linear-gradient(180deg, var(--bg), #151331);
+      color:#eaf2ff; border:1px solid var(--bd); border-radius:12px; padding:8px 12px; font-weight:900; text-transform:uppercase; letter-spacing:.3px; cursor:pointer;
+      box-shadow: 0 6px 0 var(--bs), 0 0 16px rgba(124,247,255,.08); transition: transform .02s, box-shadow .02s; }
+    .btn3d:active{ transform:translateY(2px); box-shadow:0 4px 0 var(--bs) }
+    .btn3d.yl{ --bg:#2a2312; --bs:#1a1408; --bd:#705a1f; color:#fff3cc }
+
+    /* ===== Marcador TV inline (sin app-scoreboard) ===== */
+    .tv-score{
+      background:linear-gradient(180deg, rgba(16,20,34,.95), rgba(10,12,24,.92));
+      border:1px solid var(--line);
+      box-shadow:0 14px 40px rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,255,255,.04);
+      border-radius:18px; padding:14px 16px; margin-bottom:12px;
+    }
+    .row-main{ display:grid; grid-template-columns:1fr auto 1fr; gap:18px; align-items:center }
+    .team-col{ display:grid; gap:8px; justify-items:center; text-align:center }
+    .team-name{
+      font-weight:900; letter-spacing:.8px; font-size:clamp(18px,3vw,26px);
+      text-shadow:0 0 12px rgba(0,229,255,.18); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .team-name.home{ color:#7cf7ff } .team-name.away{ color:#ff9fdb }
+    .score-box{
+      min-width: clamp(92px, 12vw, 160px);
+      display:grid; place-items:center;
+      padding:8px 12px; border-radius:12px;
+      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.04), 0 6px 20px rgba(0,0,0,.25);
+    }
+    .score{
+      font-family: ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-weight:900; line-height:1; letter-spacing:3px;
+      font-size:clamp(40px, 7.8vw, 88px);
+      text-shadow:
+        0 0 0 #fff, 0 1px 0 #fff, 1px 0 0 #fff, 1px 1px 0 #fff,
+        -1px 0 0 #fff, 0 -1px 0 #fff, -1px -1px 0 #fff, 2px 2px 0 #fff,
+        0 0 14px rgba(0,229,255,.2);
+    }
+    .score.home{ color:#7cf7ff } .score.away{ color:#ff9fdb }
+    .emblem{ width:clamp(72px,9vw,110px); height:auto; pointer-events:none; filter:drop-shadow(0 2px 0 rgba(0,0,0,.45)) }
+    .divider{ height:1px; margin:10px 0 6px; background:linear-gradient(90deg, transparent, rgba(255,255,255,.08), transparent) }
+    .meta-band{ display:flex; justify-content:center; gap:12px; color:#9aa0bd; font-size:12px; flex-wrap:wrap }
+    .chip{
+      padding:2px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.16);
+      font-weight:800; letter-spacing:.35px; text-transform:uppercase;
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+    }
+    .chip.q{ color:#ffd166; border-color:rgba(255,209,102,.35) }
+    .chip.live{ color:#00e5ff; border-color:rgba(0,229,255,.35) }
+
+    /* Roster/tabla estilos compartidos */
+    table{ width:100%; border-collapse:separate; border-spacing:0 6px }
+    thead th{ text-align:left; font-size:12px; color:#aeb4d3; padding:6px 8px }
+    tbody tr{ background:#121030; border:1px solid #2b2a4a; border-radius:10px }
+    td{ padding:8px; font-size:13px } .center{text-align:center} .bold{font-weight:800}
+    .chip-out{ display:inline-block; padding:2px 8px; border:1px solid rgba(255,255,255,.16); border-radius:999px; font-size:11px; font-weight:800; letter-spacing:.35px; color:#ffd6d6;
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)) }
+  </style>
+
+  <div class="wrap">
+    <!-- Filtros -->
+    <section class="filters">
+      <div class="group">
+        <label>Estado:</label>
+        <select [(ngModel)]="statusFilter" (change)="applyFilters()" class="sel">
+=======
+<section data-ui="tv">
+  <!-- ===================== ESTILOS EMBEBIDOS (solo HTML) ===================== -->
+  <style>
+    [data-ui="tv"]{
+      /* Tema oscuro (igual al TV) */
+      --bg:#000; --panel:#0e1220; --line:#22304f;
+      --text:#fff; --muted:#a7b0c3; --accent:#ffd166;
+      --home:#22d3ee; --away:#ff74d9; --ok:#34d399; --danger:#ef4444;
+      color:var(--text);
+      min-height:100vh; display:grid; place-items:flex-start;
+      background: radial-gradient(1200px 600px at 50% -220px,#1b1840 0%,#0b0a1a 55%,#080716 100%);
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+    .frame{ width:min(1280px,100%); padding:18px; margin-inline:auto }
+
+    .card{
+      background:linear-gradient(180deg, rgba(16,21,35,.96), rgba(10,13,26,.94));
+      border:1px solid var(--line); border-radius:18px; overflow:hidden;
+      box-shadow:0 22px 50px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.04);
+    }
+    .section{ padding:16px 18px }
+
+    /* Header filtros */
+    .hdr{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px;
+      padding:12px 16px; border:1px solid var(--line); border-radius:14px;
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)); }
+    .title{ font-weight:900; font-size:20px; letter-spacing:.2px }
+    .filters{ display:flex; flex-wrap:wrap; gap:10px; align-items:center }
+    .lbl{ font-size:12px; color:var(--muted) }
+    .select, .input{
+      appearance:none; background:rgba(255,255,255,.04); color:var(--text);
+      border:1px solid rgba(255,255,255,.16); border-radius:10px; padding:8px 10px; font-size:14px;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.05);
+    }
+    .select:focus, .input:focus{ outline:none; border-color:#69e2ff66; box-shadow:0 0 0 3px #69e2ff1e }
+
+    /* Layout columnas */
+    .grid2{ display:grid; gap:16px; grid-template-columns: 1fr 2fr; margin-top:14px }
+    @media (max-width: 1024px){ .grid2{ grid-template-columns: 1fr } }
+
+    /* Lista de partidos */
+    .list{ padding:8px }
+    .list h3{ font-weight:800; font-size:14px; color:#cfd6f8; letter-spacing:.3px; margin-bottom:8px }
+    .item{ padding:12px; border-radius:12px; display:flex; align-items:center; justify-content:space-between; gap:10px;
+      border:1px solid rgba(255,255,255,.08); background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015)); }
+    .item + .item{ margin-top:8px }
+    .item:hover{ border-color:#69e2ff4d; background:linear-gradient(180deg, rgba(124,247,255,.06), rgba(255,255,255,.015)) }
+    .teams-row{ font-weight:700 }
+    .meta{ font-size:12px; color:var(--muted) }
+    .pill{ padding:6px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.16); font-size:12px; font-weight:800 }
+    .pill.live{ color:#22d3ee; border-color:rgba(34,211,238,.45) }
+    .pill.done{ color:#34d399; border-color:rgba(52,211,153,.45) }
+    .pill.sched{ color:#60a5fa; border-color:#60a5fa66 }
+    .btn-link{ color:#8ab8ff; font-weight:800; border:1px solid rgba(138,184,255,.35); padding:6px 10px; border-radius:10px; background:transparent }
+    .btn-link:hover{ background:#8ab8ff16 }
+
+    /* Detalle */
+    .detail-hdr{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .scoreline{ font-size:18px; font-weight:900; letter-spacing:.2px }
+    .bonus{ padding:4px 8px; border-radius:8px; background:#ef4444; color:white; font-size:12px; font-weight:900 }
+    .bonus-wrap{ display:flex; align-items:center; gap:8px; color:#cfd6f8; font-size:13px }
+
+    .divider{ height:1px; background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent); margin:10px 0 }
+
+    /* Botones "detalle por jugador" */
+    .btn{ padding:8px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.16); background:rgba(255,255,255,.03);
+      color:#cfd6f8; font-weight:800; cursor:pointer }
+    .btn:hover{ border-color:#69e2ff66; color:#e7f9ff }
+
+    /* Tablas oscuras */
+    table{ width:100%; border-collapse:separate; border-spacing:0 }
+    thead th{
+      font-size:12px; text-transform:uppercase; letter-spacing:.4px; color:#cfd6f8; font-weight:900;
+      background:rgba(255,255,255,.04);
+      border-bottom:1px solid rgba(255,255,255,.12);
+      padding:10px 8px;
+      position:sticky; top:0; z-index:1;
+    }
+    tbody td{ padding:10px 8px; border-bottom:1px solid rgba(255,255,255,.06); font-size:13px }
+    tfoot td{ padding:10px 8px; border-top:1px solid rgba(255,255,255,.12); font-weight:900 }
+    .chip-type{
+      display:inline-block; padding:4px 8px; border-radius:8px; color:white; font-weight:800; font-size:12px
+    }
+    .t-personal{ background:#374151 }
+    .t-tech{ background:#2563eb }
+    .t-uns{ background:#b45309 }
+    .t-disq{ background:#dc2626 }
+
+    .scroll{ max-height:16rem; overflow:auto }
+    .scroll-x{ overflow:auto }
+    .muted{ color:var(--muted) }
+  </style>
+  <!-- ======================================================================= -->
+
+  <div class="frame">
+    <!-- ======= FILTROS ======= -->
+    <div class="hdr">
+      <div class="title">Resultados</div>
+      <div class="filters">
+        <span class="lbl">Estado:</span>
+        <select [(ngModel)]="statusFilter" (change)="applyFilters()" class="select">
+>>>>>>> Stashed changes
+          <option value="FINISHED">Finalizados</option>
+          <option value="ALL">Todos</option>
+          <option value="IN_PROGRESS">En progreso</option>
+          <option value="SCHEDULED">Programados</option>
+        </select>
+
+<<<<<<< Updated upstream
+        <label>Equipo:</label>
+        <input [(ngModel)]="q" (input)="applyFilters()" class="inp" placeholder="nombre contiene…">
+      </div>
+    </section>
+
+    <section class="grid">
+      <!-- Lista -->
+      <div class="panel">
+        <div class="h3">Partidos</div>
+        <ul class="list scroll">
+          <li *ngFor="let g of filtered" class="row">
+            <div>
+              <div style="font-weight:900">{{ g.homeTeam }} vs {{ g.awayTeam }}</div>
+              <div class="meta">Q{{ g.quarter }} — {{ g.status }}</div>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center">
+              <button class="btn3d yl" (click)="view(g)">Ver</button>
+              <span class="chip" style="color:#aeb4d3;border-color:rgba(255,255,255,.12)"> {{ g.status }} </span>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Detalle -->
+      <div class="panel" *ngIf="selected as d">
+        <ng-container *ngIf="d.game as g">
+          <!-- Marcador TV inline (sin app-scoreboard) -->
+          <section class="tv-score" aria-label="Marcador principal">
+            <div class="row-main">
+              <div class="team-col">
+                <div class="team-name home">{{ g.homeTeam }}</div>
+                <div class="score-box"><div class="score home">{{ g.homeScore }}</div></div>
+              </div>
+
+              <!-- Emblema: balón entrando al aro -->
+              <svg class="emblem" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <ellipse cx="32" cy="22" rx="16" ry="5" fill="none" stroke="#00e5ff" stroke-width="2"/>
+                <path d="M16 22c2 6 6 16 16 16s14-10 16-16" fill="none" stroke="#7cf7ff" stroke-width="2" opacity=".85"/>
+                <path d="M20 26c4 4 8 8 12 8s8-4 12-8" fill="none" stroke="#7cf7ff" stroke-width="1.5" opacity=".6"/>
+                <g>
+                  <circle cx="32" cy="12.5" r="7.5" fill="#ff9f1c" stroke="#ffd166" stroke-width="1.8"/>
+                  <path d="M25.5 12.5h13M32 5v15M28 8.5c4 3 4 9 0 12M36 8.5c-4 3-4 9 0 12"
+                        stroke="#7c2d12" stroke-width="1.2" fill="none"/>
+                </g>
+              </svg>
+
+              <div class="team-col">
+                <div class="team-name away">{{ g.awayTeam }}</div>
+                <div class="score-box"><div class="score away">{{ g.awayScore }}</div></div>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+            <div class="meta-band">
+              <span class="chip q">Q{{ g.quarter }}</span>
+              <span class="chip" [class.live]="g.status==='IN_PROGRESS'">{{ g.status }}</span>
+            </div>
+          </section>
+
+          <!-- Eventos recientes (usar d.events del seleccionado) -->
+          <div class="h3" style="margin-top:10px">Eventos recientes</div>
+          <ul class="scroll" style="list-style:none;margin:0;padding:0;border-top:1px solid rgba(255,255,255,.06)">
+            <li *ngFor="let e of d.events" style="padding:8px 0; border-bottom:1px solid rgba(255,255,255,.06); font-size:13px">
+              {{ e.createdAt | date:'short' }} — {{ e.eventType }}
+              <ng-container *ngIf="e.team">({{ e.team }})</ng-container>
+              <ng-container *ngIf="e.playerNumber != null"> #{{ e.playerNumber }}</ng-container>
+              <ng-container *ngIf="e.playerId != null"> (id: {{ e.playerId }})</ng-container>
+            </li>
+          </ul>
+
+          <!-- Plantillas -->
+          <div style="display:grid; gap:16px; grid-template-columns:1fr 1fr; margin-top:14px">
+            <!-- HOME -->
+            <div>
+              <div class="h3">Plantilla HOME
+                <span *ngIf="(foulSummary?.team | isBonus:'HOME':g.quarter)" class="chip">BONUS</span>
+              </div>
+              <table>
+                <thead><tr>
+                  <th style="width:3rem;">#</th><th>Jugador</th>
+                  <th style="width:3rem;text-align:center;">Q1</th>
+                  <th style="width:3rem;text-align:center;">Q2</th>
+                  <th style="width:3rem;text-align:center;">Q3</th>
+                  <th style="width:3rem;text-align:center;">Q4</th>
+                  <th style="width:3.5rem;text-align:center;">Total</th>
+                  <th style="width:3.5rem;"></th>
+                </tr></thead>
+                <tbody>
+                  <tr *ngFor="let p of homeRoster">
+                    <td>{{ p.number ?? '—' }}</td>
+                    <td>{{ p.name }}</td>
+                    <td class="center">{{ (foulSummary?.players | playerFoulsQ:'HOME':p.playerId:1) }}</td>
+                    <td class="center">{{ (foulSummary?.players | playerFoulsQ:'HOME':p.playerId:2) }}</td>
+                    <td class="center">{{ (foulSummary?.players | playerFoulsQ:'HOME':p.playerId:3) }}</td>
+                    <td class="center">{{ (foulSummary?.players | playerFoulsQ:'HOME':p.playerId:4) }}</td>
+                    <td class="center bold">{{ (foulSummary?.players | playerFoulsTotal:'HOME':p.playerId) }}</td>
+                    <td><span *ngIf="outSet.has(p.playerId)" class="chip-out">OUT</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- AWAY -->
+            <div>
+              <div class="h3">Plantilla AWAY
+                <span *ngIf="(foulSummary?.team | isBonus:'AWAY':g.quarter)" class="chip">BONUS</span>
+              </div>
+              <table>
+                <thead><tr>
+                  <th style="width:3rem;">#</th><th>Jugador</th>
+                  <th style="width:3rem;text-align:center;">Q1</th>
+                  <th style="width:3rem;text-align:center;">Q2</th>
+                  <th style="width:3rem;text-align:center;">Q3</th>
+                  <th style="width:3rem;text-align:center;">Q4</th>
+                  <th style="width:3.5rem;text-align:center;">Total</th>
+                  <th style="width:3.5rem;"></th>
+                </tr></thead>
+                <tbody>
+                  <tr *ngFor="let p of awayRoster">
+                    <td>{{ p.number ?? '—' }}</td>
+                    <td>{{ p.name }}</td>
+                    <td class="center">{{ (foulSummary?.players | playerFoulsQ:'AWAY':p.playerId:1) }}</td>
+                    <td class="center">{{ (foulSummary?.players | playerFoulsQ:'AWAY':p.playerId:2) }}</td>
+                    <td class="center">{{ (foulSummary?.players | playerFoulsQ:'AWAY':p.playerId:3) }}</td>
+                    <td class="center">{{ (foulSummary?.players | playerFoulsQ:'AWAY':p.playerId:4) }}</td>
+                    <td class="center bold">{{ (foulSummary?.players | playerFoulsTotal:'AWAY':p.playerId) }}</td>
+                    <td><span *ngIf="outSet.has(p.playerId)" class="chip-out">OUT</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </section>
   </div>
-
-  <div class="grid gap-4" style="grid-template-columns: 1fr 2fr;">
-    <!-- Lista de partidos -->
-    <div class="border rounded p-3">
-      <h3 class="font-medium mb-2">Partidos</h3>
-      <ul class="divide-y">
-        <li *ngFor="let g of filtered" class="py-2 flex items-center justify-between">
-          <div>
-            <div class="font-semibold">{{ g.homeTeam }} vs {{ g.awayTeam }}</div>
-            <div class="text-xs text-gray-500">Q{{ g.quarter }} — {{ g.status }}</div>
-          </div>
-          <button class="text-blue-600" (click)="view(g)">Ver</button>
-        </li>
-      </ul>
+=======
+        <span class="lbl">Buscar equipo:</span>
+        <input [(ngModel)]="q" (input)="applyFilters()" placeholder="nombre contiene…" class="input" />
+      </div>
     </div>
 
-    <!-- Detalle -->
-    <div *ngIf="selected as d" class="border rounded p-3">
-      <div class="flex items-center justify-between">
-        <div>
-          <div class="text-lg font-semibold">
-            {{ d.game.homeTeam }} {{ d.game.homeScore }} - {{ d.game.awayScore }} {{ d.game.awayTeam }}
-          </div>
-          <div class="text-xs text-gray-500">Q{{ d.game.quarter }} — {{ d.game.status }}</div>
-        </div>
-
-        <!-- BONUS por equipo en el cuarto actual -->
-        <div class="text-sm">
-          <span class="mr-3">
-            HOME Q{{ d.game.quarter }}: {{ (foulSummary?.team | teamFouls:'HOME':d.game.quarter) }}
-          </span>
-          <span *ngIf="(foulSummary?.team | isBonus:'HOME':d.game.quarter)"
-                class="px-2 py-0.5 bg-red-600 text-white rounded">BONUS</span>
-
-          <span class="ml-4 mr-3">
-            AWAY Q{{ d.game.quarter }}: {{ (foulSummary?.team | teamFouls:'AWAY':d.game.quarter) }}
-          </span>
-          <span *ngIf="(foulSummary?.team | isBonus:'AWAY':d.game.quarter)"
-                class="px-2 py-0.5 bg-red-600 text-white rounded">BONUS</span>
-        </div>
-      </div>
-
-      <!-- =================== HOME =================== -->
-      <div class="mt-4 border rounded p-2">
-        <div class="flex items-center justify-between">
-          <div class="font-semibold">Faltas HOME por tipo</div>
-          <button class="px-3 py-1 rounded border" (click)="showHomeDetail = !showHomeDetail">
-            {{ showHomeDetail ? 'Ocultar detalle HOME' : 'Detalle por jugador (HOME)' }}
-          </button>
-        </div>
-
-        <!-- Tabla HOME por tipo y por cuarto -->
-        <table class="w-full text-sm mt-2">
-          <thead>
-            <tr class="text-left">
-              <th style="width:9rem;">Tipo</th>
-              <th *ngFor="let q of quarters" style="text-align:center;">Q{{ q }}</th>
-              <th style="text-align:center;">Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let t of foulTypes">
-              <td>
-                <span class="px-2 py-0.5 rounded text-white"
-                      [ngClass]="{
-                        'bg-gray-700': t==='PERSONAL',
-                        'bg-blue-600': t==='TECHNICAL',
-                        'bg-amber-600': t==='UNSPORTSMANLIKE',
-                        'bg-red-600': t==='DISQUALIFYING'
-                      }">{{ t }}</span>
-              </td>
-              <td *ngFor="let q of quarters" style="text-align:center;">
-                {{ teamFoulsByType('HOME', t, q) }}
-              </td>
-              <td style="text-align:center; font-weight:600;">
-                {{ teamFoulsByTypeTotal('HOME', t) }}
-              </td>
-            </tr>
-          </tbody>
-          <tfoot>
-            <tr class="font-semibold">
-              <td>Total equipo</td>
-              <td *ngFor="let q of quarters" style="text-align:center;">
-                {{ teamFoulsAllTypesByQuarter('HOME', q) }}
-              </td>
-              <td style="text-align:center;">
-                {{ teamFoulsAllTypesTotal('HOME') }}
-              </td>
-            </tr>
-          </tfoot>
-        </table>
-
-        <!-- Detalle HOME por jugador -->
-        <div *ngIf="showHomeDetail" class="mt-3 border rounded p-2">
-          <div class="font-semibold mb-1">Detalle por jugador — HOME</div>
-          <div class="overflow-auto">
-            <table class="w-full text-sm min-w-[56rem]">
-              <thead>
-                <tr class="text-left">
-                  <th rowspan="2" style="width:3rem;">#</th>
-                  <th rowspan="2">Jugador</th>
-                  <ng-container *ngFor="let q of quarters">
-                    <th [attr.colspan]="5" style="text-align:center;">Q{{ q }}</th>
-                  </ng-container>
-                  <th [attr.colspan]="5" style="text-align:center;">Total</th>
-                </tr>
-                <tr>
-                  <ng-container *ngFor="let q of quarters">
-                    <th style="text-align:center;">P</th>
-                    <th style="text-align:center;">T</th>
-                    <th style="text-align:center;">U</th>
-                    <th style="text-align:center;">D</th>
-                    <th style="text-align:center;">Tot</th>
-                  </ng-container>
-                  <th style="text-align:center;">P</th>
-                  <th style="text-align:center;">T</th>
-                  <th style="text-align:center;">U</th>
-                  <th style="text-align:center;">D</th>
-                  <th style="text-align:center;">Tot</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let p of homeRoster">
-                  <td>{{ p.number ?? '—' }}</td>
-                  <td>{{ p.name }}</td>
-
-                  <ng-container *ngFor="let q of quarters">
-                    <td style="text-align:center;">{{ playerFoulsByTypeQ('HOME', p.playerId, 'PERSONAL',        q) }}</td>
-                    <td style="text-align:center;">{{ playerFoulsByTypeQ('HOME', p.playerId, 'TECHNICAL',       q) }}</td>
-                    <td style="text-align:center;">{{ playerFoulsByTypeQ('HOME', p.playerId, 'UNSPORTSMANLIKE', q) }}</td>
-                    <td style="text-align:center;">{{ playerFoulsByTypeQ('HOME', p.playerId, 'DISQUALIFYING',   q) }}</td>
-                    <td style="text-align:center; font-weight:600;">{{ playerFoulsQuarterTotal('HOME', p.playerId, q) }}</td>
-                  </ng-container>
-
-                  <td style="text-align:center;">{{ playerFoulsTotalByType('HOME', p.playerId, 'PERSONAL') }}</td>
-                  <td style="text-align:center;">{{ playerFoulsTotalByType('HOME', p.playerId, 'TECHNICAL') }}</td>
-                  <td style="text-align:center;">{{ playerFoulsTotalByType('HOME', p.playerId, 'UNSPORTSMANLIKE') }}</td>
-                  <td style="text-align:center;">{{ playerFoulsTotalByType('HOME', p.playerId, 'DISQUALIFYING') }}</td>
-                  <td style="text-align:center; font-weight:600;">{{ playerFoulsTotalAll('HOME', p.playerId) }}</td>
-                </tr>
-
-                <!-- Equipo (sin asignar) -->
-                <tr class="bg-gray-50">
-                  <td>—</td>
-                  <td class="font-medium italic">Equipo (sin asignar)</td>
-                  <ng-container *ngFor="let q of quarters">
-                    <td style="text-align:center;">{{ unassignedByTypeQ('HOME', 'PERSONAL',        q) }}</td>
-                    <td style="text-align:center;">{{ unassignedByTypeQ('HOME', 'TECHNICAL',       q) }}</td>
-                    <td style="text-align:center;">{{ unassignedByTypeQ('HOME', 'UNSPORTSMANLIKE', q) }}</td>
-                    <td style="text-align:center;">{{ unassignedByTypeQ('HOME', 'DISQUALIFYING',   q) }}</td>
-                    <td style="text-align:center; font-weight:600;">{{ unassignedQuarterTotal('HOME', q) }}</td>
-                  </ng-container>
-                  <td style="text-align:center;">{{ unassignedTotalByType('HOME', 'PERSONAL') }}</td>
-                  <td style="text-align:center;">{{ unassignedTotalByType('HOME', 'TECHNICAL') }}</td>
-                  <td style="text-align:center;">{{ unassignedTotalByType('HOME', 'UNSPORTSMANLIKE') }}</td>
-                  <td style="text-align:center;">{{ unassignedTotalByType('HOME', 'DISQUALIFYING') }}</td>
-                  <td style="text-align:center; font-weight:600;">{{ unassignedTotalAll('HOME') }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+    <div class="grid2">
+      <!-- ======= LISTA DE PARTIDOS ======= -->
+      <div class="card">
+        <div class="section list">
+          <h3>Partidos</h3>
+          <ul>
+            <li *ngFor="let g of filtered" class="item">
+              <div>
+                <div class="teams-row">{{ g.homeTeam }} vs {{ g.awayTeam }}</div>
+                <div class="meta">
+                  Q{{ g.quarter }} —
+                  <span
+                    class="pill"
+                    [ngClass]="{
+                      'live': g.status==='IN_PROGRESS',
+                      'done': g.status==='FINISHED',
+                      'sched': g.status==='SCHEDULED'
+                    }"
+                  >
+                    {{ g.status }}
+                  </span>
+                </div>
+              </div>
+              <button class="btn-link" (click)="view(g)">Ver</button>
+            </li>
+          </ul>
         </div>
       </div>
 
-      <!-- =================== AWAY =================== -->
-      <div class="mt-4 border rounded p-2">
-        <div class="flex items-center justify-between">
-          <div class="font-semibold">Faltas AWAY por tipo</div>
-          <button class="px-3 py-1 rounded border" (click)="showAwayDetail = !showAwayDetail">
-            {{ showAwayDetail ? 'Ocultar detalle AWAY' : 'Detalle por jugador (AWAY)' }}
-          </button>
-        </div>
+      <!-- ======= DETALLE ======= -->
+      <div *ngIf="selected as d" class="card">
+        <div class="section">
+          <div class="detail-hdr">
+            <div>
+              <div class="scoreline">
+                {{ d.game.homeTeam }} {{ d.game.homeScore }} - {{ d.game.awayScore }} {{ d.game.awayTeam }}
+              </div>
+              <div class="meta">Q{{ d.game.quarter }} — {{ d.game.status }}</div>
+            </div>
 
-        <!-- Tabla AWAY por tipo y por cuarto -->
-        <table class="w-full text-sm mt-2">
-          <thead>
-            <tr class="text-left">
-              <th style="width:9rem;">Tipo</th>
-              <th *ngFor="let q of quarters" style="text-align:center;">Q{{ q }}</th>
-              <th style="text-align:center;">Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let t of foulTypes">
-              <td>
-                <span class="px-2 py-0.5 rounded text-white"
-                      [ngClass]="{
-                        'bg-gray-700': t==='PERSONAL',
-                        'bg-blue-600': t==='TECHNICAL',
-                        'bg-amber-600': t==='UNSPORTSMANLIKE',
-                        'bg-red-600': t==='DISQUALIFYING'
-                      }">{{ t }}</span>
-              </td>
-              <td *ngFor="let q of quarters" style="text-align:center;">
-                {{ teamFoulsByType('AWAY', t, q) }}
-              </td>
-              <td style="text-align:center; font-weight:600;">
-                {{ teamFoulsByTypeTotal('AWAY', t) }}
-              </td>
-            </tr>
-          </tbody>
-          <tfoot>
-            <tr class="font-semibold">
-              <td>Total equipo</td>
-              <td *ngFor="let q of quarters" style="text-align:center;">
-                {{ teamFoulsAllTypesByQuarter('AWAY', q) }}
-              </td>
-              <td style="text-align:center;">
-                {{ teamFoulsAllTypesTotal('AWAY') }}
-              </td>
-            </tr>
-          </tfoot>
-        </table>
+            <!-- BONUS por equipo -->
+            <div class="bonus-wrap">
+              <span>HOME Q{{ d.game.quarter }}:
+                {{ (foulSummary?.team | teamFouls:'HOME':d.game.quarter) }}
+              </span>
+              <span *ngIf="(foulSummary?.team | isBonus:'HOME':d.game.quarter)" class="bonus">BONUS</span>
 
-        <!-- Detalle AWAY por jugador -->
-        <div *ngIf="showAwayDetail" class="mt-3 border rounded p-2">
-          <div class="font-semibold mb-1">Detalle por jugador — AWAY</div>
-          <div class="overflow-auto">
-            <table class="w-full text-sm min-w-[56rem]">
-              <thead>
-                <tr class="text-left">
-                  <th rowspan="2" style="width:3rem;">#</th>
-                  <th rowspan="2">Jugador</th>
-                  <ng-container *ngFor="let q of quarters">
-                    <th [attr.colspan]="5" style="text-align:center;">Q{{ q }}</th>
-                  </ng-container>
-                  <th [attr.colspan]="5" style="text-align:center;">Total</th>
-                </tr>
-                <tr>
-                  <ng-container *ngFor="let q of quarters">
-                    <th style="text-align:center;">P</th>
-                    <th style="text-align:center;">T</th>
-                    <th style="text-align:center;">U</th>
-                    <th style="text-align:center;">D</th>
-                    <th style="text-align:center;">Tot</th>
-                  </ng-container>
-                  <th style="text-align:center;">P</th>
-                  <th style="text-align:center;">T</th>
-                  <th style="text-align:center;">U</th>
-                  <th style="text-align:center;">D</th>
-                  <th style="text-align:center;">Tot</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let p of awayRoster">
-                  <td>{{ p.number ?? '—' }}</td>
-                  <td>{{ p.name }}</td>
-
-                  <ng-container *ngFor="let q of quarters">
-                    <td style="text-align:center;">{{ playerFoulsByTypeQ('AWAY', p.playerId, 'PERSONAL',        q) }}</td>
-                    <td style="text-align:center;">{{ playerFoulsByTypeQ('AWAY', p.playerId, 'TECHNICAL',       q) }}</td>
-                    <td style="text-align:center;">{{ playerFoulsByTypeQ('AWAY', p.playerId, 'UNSPORTSMANLIKE', q) }}</td>
-                    <td style="text-align:center;">{{ playerFoulsByTypeQ('AWAY', p.playerId, 'DISQUALIFYING',   q) }}</td>
-                    <td style="text-align:center; font-weight:600;">{{ playerFoulsQuarterTotal('AWAY', p.playerId, q) }}</td>
-                  </ng-container>
-
-                  <td style="text-align:center;">{{ playerFoulsTotalByType('AWAY', p.playerId, 'PERSONAL') }}</td>
-                  <td style="text-align:center;">{{ playerFoulsTotalByType('AWAY', p.playerId, 'TECHNICAL') }}</td>
-                  <td style="text-align:center;">{{ playerFoulsTotalByType('AWAY', p.playerId, 'UNSPORTSMANLIKE') }}</td>
-                  <td style="text-align:center;">{{ playerFoulsTotalByType('AWAY', p.playerId, 'DISQUALIFYING') }}</td>
-                  <td style="text-align:center; font-weight:600;">{{ playerFoulsTotalAll('AWAY', p.playerId) }}</td>
-                </tr>
-
-                <!-- Equipo (sin asignar) -->
-                <tr class="bg-gray-50">
-                  <td>—</td>
-                  <td class="font-medium italic">Equipo (sin asignar)</td>
-                  <ng-container *ngFor="let q of quarters">
-                    <td style="text-align:center;">{{ unassignedByTypeQ('AWAY', 'PERSONAL',        q) }}</td>
-                    <td style="text-align:center;">{{ unassignedByTypeQ('AWAY', 'TECHNICAL',       q) }}</td>
-                    <td style="text-align:center;">{{ unassignedByTypeQ('AWAY', 'UNSPORTSMANLIKE', q) }}</td>
-                    <td style="text-align:center;">{{ unassignedByTypeQ('AWAY', 'DISQUALIFYING',   q) }}</td>
-                    <td style="text-align:center; font-weight:600;">{{ unassignedQuarterTotal('AWAY', q) }}</td>
-                  </ng-container>
-                  <td style="text-align:center;">{{ unassignedTotalByType('AWAY', 'PERSONAL') }}</td>
-                  <td style="text-align:center;">{{ unassignedTotalByType('AWAY', 'TECHNICAL') }}</td>
-                  <td style="text-align:center;">{{ unassignedTotalByType('AWAY', 'UNSPORTSMANLIKE') }}</td>
-                  <td style="text-align:center;">{{ unassignedTotalByType('AWAY', 'DISQUALIFYING') }}</td>
-                  <td style="text-align:center; font-weight:600;">{{ unassignedTotalAll('AWAY') }}</td>
-                </tr>
-              </tbody>
-            </table>
+              <span>AWAY Q{{ d.game.quarter }}:
+                {{ (foulSummary?.team | teamFouls:'AWAY':d.game.quarter) }}
+              </span>
+              <span *ngIf="(foulSummary?.team | isBonus:'AWAY':d.game.quarter)" class="bonus">BONUS</span>
+            </div>
           </div>
-        </div>
-      </div>
 
-      <!-- Eventos -->
-      <h4 class="mt-4 font-semibold">Eventos recientes</h4>
-      <ul class="text-sm divide-y" style="max-height:16rem; overflow:auto;">
-        <li *ngFor="let e of d.events" class="py-1">
-          {{ e.createdAt | date:'short' }} — {{ e.eventType }}
-          <ng-container *ngIf="e.team">({{ e.team }})</ng-container>
-          <ng-container *ngIf="e.playerNumber != null"> #{{ e.playerNumber }}</ng-container>
-          <ng-container *ngIf="e.playerId != null"> (id: {{ e.playerId }})</ng-container>
+          <div class="divider"></div>
 
-          <ng-container *ngIf="e.eventType === 'FOUL'">
-            <span class="ml-2 px-2 py-0.5 rounded text-white"
-                  [ngClass]="{
-                    'bg-gray-700': (e.foulType || 'PERSONAL')==='PERSONAL',
-                    'bg-blue-600': e.foulType==='TECHNICAL',
-                    'bg-amber-600': e.foulType==='UNSPORTSMANLIKE',
-                    'bg-red-600': e.foulType==='DISQUALIFYING'
-                  }">
-              {{ (e.foulType || 'PERSONAL') }}
-            </span>
-          </ng-container>
-        </li>
-      </ul>
-    </div>
-  </div>
-</div>
+          <!-- =================== HOME =================== -->
+          <div class="card" style="border-radius:14px;">
+            <div class="section" style="padding:12px 14px;">
+              <div class="detail-hdr">
+                <div class="title" style="font-size:16px">Faltas HOME por tipo</div>
+                <button class="btn" (click)="showHomeDetail = !showHomeDetail">
+                  {{ showHomeDetail ? 'Ocultar detalle HOME' : 'Detalle por jugador (HOME)' }}
+                </button>
+              </div>
+
+              <!-- Tabla HOME por tipo y por cuarto -->
+              <div class="scroll-x" style="margin-top:10px;">
+                <table class="text-sm">
+                  <thead>
+                    <tr class="text-left">
+                      <th style="width:9rem;">Tipo</th>
+                      <th *ngFor="let q of quarters" style="text-align:center;">Q{{ q }}</th>
+                      <th style="text-align:center;">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let t of foulTypes">
+                      <td>
+                        <span class="chip-type"
+                              [ngClass]="{
+                                't-personal': t==='PERSONAL',
+                                't-tech': t==='TECHNICAL',
+                                't-uns': t==='UNSPORTSMANLIKE',
+                                't-disq': t==='DISQUALIFYING'
+                              }">{{ t }}</span>
+                      </td>
+                      <td *ngFor="let q of quarters" style="text-align:center;">
+                        {{ teamFoulsByType('HOME', t, q) }}
+                      </td>
+                      <td style="text-align:center; font-weight:900;">
+                        {{ teamFoulsByTypeTotal('HOME', t) }}
+                      </td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <td>Total equipo</td>
+                      <td *ngFor="let q of quarters" style="text-align:center;">
+                        {{ teamFoulsAllTypesByQuarter('HOME', q) }}
+                      </td>
+                      <td style="text-align:center;">
+                        {{ teamFoulsAllTypesTotal('HOME') }}
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+
+              <!-- Detalle HOME por jugador -->
+              <div *ngIf="showHomeDetail" class="card" style="margin-top:12px; border-radius:12px;">
+                <div class="section" style="padding:10px 12px;">
+                  <div class="title" style="font-size:14px; margin-bottom:6px;">Detalle por jugador — HOME</div>
+                  <div class="scroll-x">
+                    <table class="text-sm" style="min-width:56rem">
+                      <thead>
+                        <tr class="text-left">
+                          <th rowspan="2" style="width:3rem;">#</th>
+                          <th rowspan="2">Jugador</th>
+                          <ng-container *ngFor="let q of quarters">
+                            <th [attr.colspan]="5" style="text-align:center;">Q{{ q }}</th>
+                          </ng-container>
+                          <th [attr.colspan]="5" style="text-align:center;">Total</th>
+                        </tr>
+                        <tr>
+                          <ng-container *ngFor="let q of quarters">
+                            <th style="text-align:center;">P</th>
+                            <th style="text-align:center;">T</th>
+                            <th style="text-align:center;">U</th>
+                            <th style="text-align:center;">D</th>
+                            <th style="text-align:center;">Tot</th>
+                          </ng-container>
+                          <th style="text-align:center;">P</th>
+                          <th style="text-align:center;">T</th>
+                          <th style="text-align:center;">U</th>
+                          <th style="text-align:center;">D</th>
+                          <th style="text-align:center;">Tot</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let p of homeRoster">
+                          <td>{{ p.number ?? '—' }}</td>
+                          <td>{{ p.name }}</td>
+
+                          <ng-container *ngFor="let q of quarters">
+                            <td style="text-align:center;">{{ playerFoulsByTypeQ('HOME', p.playerId, 'PERSONAL',        q) }}</td>
+                            <td style="text-align:center;">{{ playerFoulsByTypeQ('HOME', p.playerId, 'TECHNICAL',       q) }}</td>
+                            <td style="text-align:center;">{{ playerFoulsByTypeQ('HOME', p.playerId, 'UNSPORTSMANLIKE', q) }}</td>
+                            <td style="text-align:center;">{{ playerFoulsByTypeQ('HOME', p.playerId, 'DISQUALIFYING',   q) }}</td>
+                            <td style="text-align:center; font-weight:900;">{{ playerFoulsQuarterTotal('HOME', p.playerId, q) }}</td>
+                          </ng-container>
+
+                          <td style="text-align:center;">{{ playerFoulsTotalByType('HOME', p.playerId, 'PERSONAL') }}</td>
+                          <td style="text-align:center;">{{ playerFoulsTotalByType('HOME', p.playerId, 'TECHNICAL') }}</td>
+                          <td style="text-align:center;">{{ playerFoulsTotalByType('HOME', p.playerId, 'UNSPORTSMANLIKE') }}</td>
+                          <td style="text-align:center;">{{ playerFoulsTotalByType('HOME', p.playerId, 'DISQUALIFYING') }}</td>
+                          <td style="text-align:center; font-weight:900;">{{ playerFoulsTotalAll('HOME', p.playerId) }}</td>
+                        </tr>
+
+                        <!-- Equipo (sin asignar) -->
+                        <tr style="background:rgba(255,255,255,.03)">
+                          <td>—</td>
+                          <td class="muted" style="font-style:italic; font-weight:700;">Equipo (sin asignar)</td>
+                          <ng-container *ngFor="let q of quarters">
+                            <td style="text-align:center;">{{ unassignedByTypeQ('HOME', 'PERSONAL',        q) }}</td>
+                            <td style="text-align:center;">{{ unassignedByTypeQ('HOME', 'TECHNICAL',       q) }}</td>
+                            <td style="text-align:center;">{{ unassignedByTypeQ('HOME', 'UNSPORTSMANLIKE', q) }}</td>
+                            <td style="text-align:center;">{{ unassignedByTypeQ('HOME', 'DISQUALIFYING',   q) }}</td>
+                            <td style="text-align:center; font-weight:900;">{{ unassignedQuarterTotal('HOME', q) }}</td>
+                          </ng-container>
+                          <td style="text-align:center;">{{ unassignedTotalByType('HOME', 'PERSONAL') }}</td>
+                          <td style="text-align:center;">{{ unassignedTotalByType('HOME', 'TECHNICAL') }}</td>
+                          <td style="text-align:center;">{{ unassignedTotalByType('HOME', 'UNSPORTSMANLIKE') }}</td>
+                          <td style="text-align:center;">{{ unassignedTotalByType('HOME', 'DISQUALIFYING') }}</td>
+                          <td style="text-align:center; font-weight:900;">{{ unassignedTotalAll('HOME') }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div> <!-- fin detalle HOME -->
+            </div>
+          </div>
+
+          <!-- =================== AWAY =================== -->
+          <div class="card" style="border-radius:14px; margin-top:14px;">
+            <div class="section" style="padding:12px 14px;">
+              <div class="detail-hdr">
+                <div class="title" style="font-size:16px">Faltas AWAY por tipo</div>
+                <button class="btn" (click)="showAwayDetail = !showAwayDetail">
+                  {{ showAwayDetail ? 'Ocultar detalle AWAY' : 'Detalle por jugador (AWAY)' }}
+                </button>
+              </div>
+
+              <!-- Tabla AWAY por tipo y por cuarto -->
+              <div class="scroll-x" style="margin-top:10px;">
+                <table class="text-sm">
+                  <thead>
+                    <tr class="text-left">
+                      <th style="width:9rem;">Tipo</th>
+                      <th *ngFor="let q of quarters" style="text-align:center;">Q{{ q }}</th>
+                      <th style="text-align:center;">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let t of foulTypes">
+                      <td>
+                        <span class="chip-type"
+                              [ngClass]="{
+                                't-personal': t==='PERSONAL',
+                                't-tech': t==='TECHNICAL',
+                                't-uns': t==='UNSPORTSMANLIKE',
+                                't-disq': t==='DISQUALIFYING'
+                              }">{{ t }}</span>
+                      </td>
+                      <td *ngFor="let q of quarters" style="text-align:center;">
+                        {{ teamFoulsByType('AWAY', t, q) }}
+                      </td>
+                      <td style="text-align:center; font-weight:900;">
+                        {{ teamFoulsByTypeTotal('AWAY', t) }}
+                      </td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <td>Total equipo</td>
+                      <td *ngFor="let q of quarters" style="text-align:center;">
+                        {{ teamFoulsAllTypesByQuarter('AWAY', q) }}
+                      </td>
+                      <td style="text-align:center;">
+                        {{ teamFoulsAllTypesTotal('AWAY') }}
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+
+              <!-- Detalle AWAY por jugador -->
+              <div *ngIf="showAwayDetail" class="card" style="margin-top:12px; border-radius:12px;">
+                <div class="section" style="padding:10px 12px;">
+                  <div class="title" style="font-size:14px; margin-bottom:6px;">Detalle por jugador — AWAY</div>
+                  <div class="scroll-x">
+                    <table class="text-sm" style="min-width:56rem">
+                      <thead>
+                        <tr class="text-left">
+                          <th rowspan="2" style="width:3rem;">#</th>
+                          <th rowspan="2">Jugador</th>
+                          <ng-container *ngFor="let q of quarters">
+                            <th [attr.colspan]="5" style="text-align:center;">Q{{ q }}</th>
+                          </ng-container>
+                          <th [attr.colspan]="5" style="text-align:center;">Total</th>
+                        </tr>
+                        <tr>
+                          <ng-container *ngFor="let q of quarters">
+                            <th style="text-align:center;">P</th>
+                            <th style="text-align:center;">T</th>
+                            <th style="text-align:center;">U</th>
+                            <th style="text-align:center;">D</th>
+                            <th style="text-align:center;">Tot</th>
+                          </ng-container>
+                          <th style="text-align:center;">P</th>
+                          <th style="text-align:center;">T</th>
+                          <th style="text-align:center;">U</th>
+                          <th style="text-align:center;">D</th>
+                          <th style="text-align:center;">Tot</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let p of awayRoster">
+                          <td>{{ p.number ?? '—' }}</td>
+                          <td>{{ p.name }}</td>
+
+                          <ng-container *ngFor="let q of quarters">
+                            <td style="text-align:center;">{{ playerFoulsByTypeQ('AWAY', p.playerId, 'PERSONAL',        q) }}</td>
+                            <td style="text-align:center;">{{ playerFoulsByTypeQ('AWAY', p.playerId, 'TECHNICAL',       q) }}</td>
+                            <td style="text-align:center;">{{ playerFoulsByTypeQ('AWAY', p.playerId, 'UNSPORTSMANLIKE', q) }}</td>
+                            <td style="text-align:center;">{{ playerFoulsByTypeQ('AWAY', p.playerId, 'DISQUALIFYING',   q) }}</td>
+                            <td style="text-align:center; font-weight:900;">{{ playerFoulsQuarterTotal('AWAY', p.playerId, q) }}</td>
+                          </ng-container>
+
+                          <td style="text-align:center;">{{ playerFoulsTotalByType('AWAY', p.playerId, 'PERSONAL') }}</td>
+                          <td style="text-align:center;">{{ playerFoulsTotalByType('AWAY', p.playerId, 'TECHNICAL') }}</td>
+                          <td style="text-align:center;">{{ playerFoulsTotalByType('AWAY', p.playerId, 'UNSPORTSMANLIKE') }}</td>
+                          <td style="text-align:center;">{{ playerFoulsTotalByType('AWAY', p.playerId, 'DISQUALIFYING') }}</td>
+                          <td style="text-align:center; font-weight:900;">{{ playerFoulsTotalAll('AWAY', p.playerId) }}</td>
+                        </tr>
+
+                        <!-- Equipo (sin asignar) -->
+                        <tr style="background:rgba(255,255,255,.03)">
+                          <td>—</td>
+                          <td class="muted" style="font-style:italic; font-weight:700;">Equipo (sin asignar)</td>
+                          <ng-container *ngFor="let q of quarters">
+                            <td style="text-align:center;">{{ unassignedByTypeQ('AWAY', 'PERSONAL',        q) }}</td>
+                            <td style="text-align:center;">{{ unassignedByTypeQ('AWAY', 'TECHNICAL',       q) }}</td>
+                            <td style="text-align:center;">{{ unassignedByTypeQ('AWAY', 'UNSPORTSMANLIKE', q) }}</td>
+                            <td style="text-align:center;">{{ unassignedByTypeQ('AWAY', 'DISQUALIFYING',   q) }}</td>
+                            <td style="text-align:center; font-weight:900;">{{ unassignedQuarterTotal('AWAY', q) }}</td>
+                          </ng-container>
+                          <td style="text-align:center;">{{ unassignedTotalByType('AWAY', 'PERSONAL') }}</td>
+                          <td style="text-align:center;">{{ unassignedTotalByType('AWAY', 'TECHNICAL') }}</td>
+                          <td style="text-align:center;">{{ unassignedTotalByType('AWAY', 'UNSPORTSMANLIKE') }}</td>
+                          <td style="text-align:center;">{{ unassignedTotalByType('AWAY', 'DISQUALIFYING') }}</td>
+                          <td style="text-align:center; font-weight:900;">{{ unassignedTotalAll('AWAY') }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div> <!-- fin detalle AWAY -->
+            </div>
+          </div>
+
+          <!-- ======= EVENTOS ======= -->
+          <div class="card" style="border-radius:14px; margin-top:14px;">
+            <div class="section">
+              <div class="title" style="font-size:16px">Eventos recientes</div>
+              <ul class="scroll" style="margin-top:8px;">
+                <li *ngFor="let e of d.events" style="padding:8px 0; border-bottom:1px solid rgba(255,255,255,.06); font-size:13px;">
+                  {{ e.createdAt | date:'short' }} — {{ e.eventType }}
+                  <ng-container *ngIf="e.team">({{ e.team }})</ng-container>
+                  <ng-container *ngIf="e.playerNumber != null"> #{{ e.playerNumber }}</ng-container>
+                  <ng-container *ngIf="e.playerId != null"> (id: {{ e.playerId }})</ng-container>
+
+                  <ng-container *ngIf="e.eventType === 'FOUL'">
+                    <span class="chip-type"
+                          [ngClass]="{
+                            't-personal': (e.foulType || 'PERSONAL')==='PERSONAL',
+                            't-tech': e.foulType==='TECHNICAL',
+                            't-uns': e.foulType==='UNSPORTSMANLIKE',
+                            't-disq': e.foulType==='DISQUALIFYING'
+                          }"
+                          style="margin-left:8px;">
+                      {{ (e.foulType || 'PERSONAL') }}
+                    </span>
+                  </ng-container>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+        </div> <!-- /section detalle -->
+      </div> <!-- /card detalle -->
+    </div> <!-- /grid2 -->
+  </div> <!-- /frame -->
+>>>>>>> Stashed changes
+</section>
