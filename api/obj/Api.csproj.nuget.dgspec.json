@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\cesar\\OneDrive\\Documentos\\GitHub\\Marcador-de-baloncesto\\api\\Api.csproj": {}
+    "C:\\Users\\Bryan Pineda\\Desktop\\8VO SEMESTRE\\DESARROLLO WEB\\Fase 2\\Marcador-de-baloncesto\\api\\Api.csproj": {}
   },
   "projects": {
-    "C:\\Users\\cesar\\OneDrive\\Documentos\\GitHub\\Marcador-de-baloncesto\\api\\Api.csproj": {
+    "C:\\Users\\Bryan Pineda\\Desktop\\8VO SEMESTRE\\DESARROLLO WEB\\Fase 2\\Marcador-de-baloncesto\\api\\Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\cesar\\OneDrive\\Documentos\\GitHub\\Marcador-de-baloncesto\\api\\Api.csproj",
+        "projectUniqueName": "C:\\Users\\Bryan Pineda\\Desktop\\8VO SEMESTRE\\DESARROLLO WEB\\Fase 2\\Marcador-de-baloncesto\\api\\Api.csproj",
         "projectName": "Api",
-        "projectPath": "C:\\Users\\cesar\\OneDrive\\Documentos\\GitHub\\Marcador-de-baloncesto\\api\\Api.csproj",
-        "packagesPath": "C:\\Users\\cesar\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\cesar\\OneDrive\\Documentos\\GitHub\\Marcador-de-baloncesto\\api\\obj\\",
+        "projectPath": "C:\\Users\\Bryan Pineda\\Desktop\\8VO SEMESTRE\\DESARROLLO WEB\\Fase 2\\Marcador-de-baloncesto\\api\\Api.csproj",
+        "packagesPath": "C:\\Users\\Bryan Pineda\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Bryan Pineda\\Desktop\\8VO SEMESTRE\\DESARROLLO WEB\\Fase 2\\Marcador-de-baloncesto\\api\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\cesar\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\Bryan Pineda\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -46,6 +46,10 @@
             "Dapper": {
               "target": "Package",
               "version": "[2.1.66, )"
+            },
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[8.0.18, )"
             },
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",

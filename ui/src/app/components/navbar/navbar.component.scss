@@ -1,0 +1,58 @@
+:root {
+  --bg:#0e0f13;
+  --text:#e6edf7;
+  --brand:#00c6ff;
+  --chip:#2a2f3a;
+}
+
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  display: grid; grid-template-columns: auto 1fr auto auto;
+  align-items: center; gap: 12px;
+  height: 56px; padding: 0 16px;
+  background: #1a1a1d; color: var(--text);
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+
+.logo { color: #fff; text-decoration: none; font-weight: 700; }
+
+.links { display: flex; gap: 18px; align-items: center; }
+.links a { color: #cbd5e1; text-decoration: none; font-weight: 500; }
+.links a.active { color: #fff; border-bottom: 2px solid var(--brand); }
+.links .btn { background: var(--brand); color: #00131a; padding: 6px 12px; border-radius: 8px; }
+
+.actions { display: flex; gap: 8px; }
+.chip {
+  background: var(--chip); color: var(--text);
+  border: 1px solid rgba(255,255,255,.08);
+  padding: 6px 10px; border-radius: 10px; cursor: pointer;
+}
+.chip--danger { background: #2c1a1a; border-color: #3b1f1f; color: #fecaca; }
+
+.hamb { display: none; background: transparent; border: 0; width: 36px; height: 36px; }
+.hamb span { display: block; height: 3px; margin: 6px 0; background: #fff; border-radius: 2px; }
+
+/* Drawer */
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); opacity: 0; pointer-events: none; transition: .2s; z-index: 40; }
+.overlay.show { opacity: 1; pointer-events: auto; }
+
+.drawer {
+  position: fixed; inset: 0 auto 0 0; width: 270px;
+  background: #111418; color: #e5e7eb;
+  transform: translateX(-100%); transition: transform .22s ease-in-out;
+  padding: 14px; z-index: 50;
+}
+.drawer.open { transform: none; }
+.drawer__head { display: flex; align-items: center; justify-content: space-between; padding: 6px 4px 12px; }
+.drawer__logo { font-weight: 700; }
+.drawer__close { background: transparent; border: 0; color: #fff; font-size: 26px; cursor: pointer; }
+.drawer a { display: block; padding: 10px 8px; border-radius: 8px; color: #d1d5db; text-decoration: none; }
+.drawer a.active { background: #1f2430; color: #fff; }
+.drawer a.btn { background: var(--brand); color: #00131a; margin-top: 8px; }
+.w-100 { width: 100%; }
+
+@media (max-width:1024px) {
+  .links { display: none; }
+  .hamb { display: block; }
+  .topbar { grid-template-columns: auto 1fr auto; }
+}

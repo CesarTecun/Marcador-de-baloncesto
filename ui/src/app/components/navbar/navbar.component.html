@@ -1,0 +1,45 @@
+<header class="topbar">
+  <div class="topbar__left">
+    <a routerLink="/" class="logo">🏀 Marcador</a>
+  </div>
+
+  <nav class="links">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Inicio</a>
+    <a routerLink="/partidos"  routerLinkActive="active">Registrar Partidos</a>
+    <a routerLink="/jugadores" routerLinkActive="active">Registrar Jugadores</a>
+    <a routerLink="/equipos"   routerLinkActive="active">Registrar Equipos</a>
+    <a routerLink="/marcador"  routerLinkActive="active">Marcador</a>
+    <a routerLink="/contacto"  class="btn">Contacto</a>
+  </nav>
+
+  <div class="actions">
+    <button class="chip" (click)="refrescar()">Actualizar</button>
+    <button class="chip" (click)="toggleTema()">{{ temaClaro ? 'Oscuro' : 'Claro' }}</button>
+    <button class="chip chip--danger" (click)="logout()">Cerrar sesión</button>
+  </div>
+
+  <button class="hamb" aria-label="Menú" (click)="toggle()">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<!-- Menú móvil -->
+<div class="overlay" [class.show]="abierto" (click)="close()"></div>
+<aside class="drawer" [class.open]="abierto">
+  <div class="drawer__head">
+    <span class="drawer__logo">Marcador</span>
+    <button class="drawer__close" (click)="close()">×</button>
+  </div>
+
+  <a (click)="close()" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Inicio</a>
+  <a (click)="close()" routerLink="/partidos"  routerLinkActive="active">Registrar Partidos</a>
+  <a (click)="close()" routerLink="/jugadores" routerLinkActive="active">Registrar Jugadores</a>
+  <a (click)="close()" routerLink="/equipos"   routerLinkActive="active">Registrar Equipos</a>
+  <a (click)="close()" routerLink="/marcador"  routerLinkActive="active">Marcador</a>
+  <a (click)="close()" routerLink="/contacto"  class="btn">Contacto</a>
+
+  <hr />
+  <button class="chip w-100" (click)="refrescar()">Actualizar</button>
+  <button class="chip w-100" (click)="toggleTema()">{{ temaClaro ? 'Oscuro' : 'Claro' }}</button>
+  <button class="chip chip--danger w-100" (click)="logout()">Cerrar sesión</button>
+</aside>

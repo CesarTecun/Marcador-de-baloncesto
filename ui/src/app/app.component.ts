@@ -2,13 +2,18 @@ import { Component, HostListener } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NotificationDisplayComponent } from './components/notification-display.component';
 import { SoundService } from './services/sound.service';
+import { NavbarComponent } from './components/navbar/navbar.component'; // ✅ importado
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, NotificationDisplayComponent],
+  imports: [
+    RouterOutlet,
+    NotificationDisplayComponent,
+    NavbarComponent // ✅ agregado aquí
+  ],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrls: ['./app.component.scss'] // ⚠️ corregido: era `styleUrl`
 })
 export class AppComponent {
   private armed = false;
